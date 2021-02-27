@@ -1,17 +1,27 @@
-import sirv from 'sirv';
-import polka from 'polka';
-import compression from 'compression';
-import * as sapper from '@sapper/server';
+/** @format */
 
-const { PORT, NODE_ENV } = process.env;
-const dev = NODE_ENV === 'development';
+import sirv from 'sirv'
+import mongoose from 'mongoose'
+import dotenv from 'dotenv'
+import dotenvExpand from 'dotenv-expand'
+dotenvExpand(dotenv.config())
+import express from 'express'
+import compression from 'compression'
+import bodyparser from 'body-parser'
+import * as sapper from '@sapper/server'
 
-polka() // You can also use Express
-	.use(
-		compression({ threshold: 0 }),
-		sirv('static', { dev }),
-		sapper.middleware()
-	)
-	.listen(PORT, err => {
-		if (err) console.log('error', err);
-	});
+const { PORT, NODE_ENV } = process.env
+const dev = NODE_ENV === 'development'
+express()
+	.use(compression({ threshold: 0 }), sirv('static', { dev }), bodyparser.json(), sapper.middleware())
+	.listen(PORT, (err) => {
+		if (err) console.log('error', err)
+	})
+
+mongoose.connect(process.env.MONGODB_URI, {
+	useNewUrlParser: true,
+	useUnifiedTopology: true,
+})
+
+mongoose.connection.on('connected', () => console.log('MongoDB Database connected!'))
+mongoose.connection.on('error', (err) => console.log(`DB CONNECTION ERROR!\n${err}`))

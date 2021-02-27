@@ -1,60 +1,94 @@
 <script>
+	import { user, logged_in } from '../stores/auth-store'
+	import { navHeight } from '../stores/position-store'
 	export let segment;
+
+	let logout = () => {
+		localStorage.removeItem("token")
+		$logged_in = false
+	}
 </script>
 
+<div class="container" bind:clientHeight={$navHeight}>
+	<div class="nav-button-group">
+		<!--<a class="nav-button" aria-current="{segment === undefined ? 'page' : undefined}" href=".">home</a>-->
+		<a class="nav-button" aria-current="{segment === 'browser' ? 'page' : undefined}" href="browser">browse</a>
+		<a class="nav-button" aria-current="{segment === 'designer' ? 'page' : undefined}" href="designer">create</a>
+		<a class="nav-button" aria-current="{segment === 'about' ? 'page' : undefined}" href="about">about</a>
+	</div>
+	{#if $logged_in}
+		<div class="login-info">
+			<div class="message">Hello, {$user.username}</div>
+			<div class="login-buttons">
+				<a href="/." on:click={logout}>logout</a>
+			</div>
+		</div>
+	{/if}
+	{#if !$logged_in}
+		<div class="login-info">
+			<div class="message">You are not logged in</div>
+			<div class="login-buttons">
+				<a rel=prefetch aria-current="{segment === 'login' ? 'page' : undefined}" href="auth/login">login</a>
+				<a aria-current="{segment === 'register' ? 'page' : undefined}" href="auth/register">register</a>
+			</div> 
+		</div>
+	{/if}
+</div>
+
 <style>
-	nav {
-		border-bottom: 1px solid rgba(255,62,0,0.1);
-		font-weight: 300;
-		padding: 0 1em;
+	.login-info {
+		display: flex;
+		flex-wrap: wrap;
+		flex-direction: row;
+		align-items: center;
 	}
-
-	ul {
-		margin: 0;
+	.message{
+		padding: 0.5em;
+	}
+	.login-buttons {
+		display: flex;
+		justify-content: space-between;
+	}
+	.login-buttons a {
 		padding: 0;
+		padding-left: 0.5em;
+		text-decoration: underline;
 	}
-
-	/* clearfix */
-	ul::after {
-		content: '';
-		display: block;
-		clear: both;
-	}
-
-	li {
-		display: block;
-		float: left;
-	}
-
-	[aria-current] {
-		position: relative;
-		display: inline-block;
-	}
-
-	[aria-current]::after {
-		position: absolute;
-		content: '';
-		width: calc(100% - 1em);
-		height: 2px;
-		background-color: rgb(255,62,0);
-		display: block;
-		bottom: -1px;
-	}
-
 	a {
 		text-decoration: none;
-		padding: 1em 0.5em;
+		padding: 0.3em 0.5em 0.3em 0;
 		display: block;
 	}
+	.container {
+		background-color: #276678;
+		color: white;
+		margin: 0;
+		padding: 1em;
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+	}
+	.nav-button-group {
+		display: flex;
+		flex-wrap: wrap;
+		flex-direction: column;
+	}
+	.nav-button {
+		margin-right: 1em;
+		font-size: normal;
+		cursor: pointer;
+	}
+
+	@media only screen and (min-width: 768px) {
+		.nav-button-group {
+			display: flex;
+			flex-wrap: wrap;
+			flex-direction: row;
+		}
+		.nav-button {
+			margin-right: 1em;
+			font-size: x-large;
+			cursor: pointer;
+		}
+	}
 </style>
-
-<nav>
-	<ul>
-		<li><a aria-current="{segment === undefined ? 'page' : undefined}" href=".">home</a></li>
-		<li><a aria-current="{segment === 'about' ? 'page' : undefined}" href="about">about</a></li>
-
-		<!-- for the blog link, we're using rel=prefetch so that Sapper prefetches
-		     the blog data when we hover over the link or tap it on a touchscreen -->
-		<li><a rel=prefetch aria-current="{segment === 'blog' ? 'page' : undefined}" href="blog">blog</a></li>
-	</ul>
-</nav>
