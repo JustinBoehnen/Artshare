@@ -9,8 +9,6 @@
 
     const dispatch = createEventDispatcher()
     var img_file
-    var pbn_name = ""
-    var pbn_tags = []
     var file_name = ""
 
     var upload_success = false
@@ -114,39 +112,20 @@
         }
     }
 
-    const validateForm = () => {
-        var err = false
-        var errstr = "Form Error!"
-        if(!upload_success){
-            err = true
-            errstr += "\n> An image must be uploaded before proceeding"
-        }
-        if(!/\S/.test(pbn_name)){
-            err = true
-            errstr += "\n> A valid name must be provided before proceeding"
-        }
-        if(err){
-            alert(errstr)
-            return false
-        }
-        else
-            return true
-    }
-
     const handleSubmit = () => {
         loadingOn()
-        if(validateForm() == true){
-            getImageHTMLFromFile(img_file).then(img_html => {
-                loadingOff()
-                dispatch('imagesubmit', {img_html:img_html, name: pbn_name, tags: ParseTags(pbn_tags)})
-            })
-        }
+        getImageHTMLFromFile(img_file).then(img_html => {
+            loadingOff()
+            dispatch('imagesubmit', {img_html:img_html})
+        })
+        
     }
 </script>
 
 <div class="container">
     <div class="card">
         <form on:submit|preventDefault={handleSubmit}>
+            <!--
             <div class="form-item">
                 <div class="label">name</div>
                 <input type="text" bind:value={pbn_name} />
@@ -155,8 +134,9 @@
                 <div class="label">tags</div>
                 <textarea rows="1" type="text" bind:value={pbn_tags} />
             </div>
+            -->
+            <h2>upload an image</h2>
             <div class="form-item">
-                <div class="label">image</div>
                 <label class="custom-file-input" for="image-input">upload image</label>
                 <div class="file-name">{file_name}</div>
                 <input on:change={(e) => handleFileChange(e.target.files)} type="file" accept=".jpg, .jpeg, .png" id="image-input" name="srcimg">
@@ -166,7 +146,7 @@
                 <img id="img-preview" alt="preview"/>
             </div>
             <div class="form-item">
-                <button disabled={!upload_success || !/\S/.test(pbn_name)} type="submit">next step</button>
+                <button disabled={!upload_success} type="submit">next step</button>
             </div>
       </form>
     </div>
@@ -174,6 +154,11 @@
 <canvas id="testcanvas"></canvas>
 
 <style>
+    h2{
+        text-align: center;
+        margin-bottom: 0.5em;
+        margin-top: 0;
+    }
     .card{
         min-width: 15em;
         box-sizing: border-box;
@@ -254,7 +239,6 @@
         padding:7.5px 39px;
         text-decoration:none;
         text-align: center;
-        margin-top: 0.5em;
         background-color: #276678;
     }
     .custom-file-input:hover{

@@ -33,7 +33,7 @@ export async function post(req, res) {
 		console.log(query._conditions)
 
 		query.sort({ likes: 'desc' })
-		query.select('name owner-name images likes dislikes num-colors tags')
+		query.select('name owner-name images likes dislikes num-colors tags likers dislikers')
 		query.exec((err, docs) => {
 			if (!err) {
 				console.log(docs)

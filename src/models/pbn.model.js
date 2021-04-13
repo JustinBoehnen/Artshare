@@ -36,6 +36,8 @@ var PBNSchema = new mongoose.Schema({
 	tags: [{ type: String }],
 	likes: Number,
 	dislikes: Number,
+	likers: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
+	dislikers: [{ type: mongoose.Types.ObjectId, ref: 'User' }],
 	images: {
 		thumbnail: { type: String, required: true },
 		'full-size-colored': { type: String, required: true },

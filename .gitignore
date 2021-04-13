@@ -3,6 +3,7 @@
 /src/node_modules/@sapper/
 yarn-error.log
 /__sapper__/
+s3_config.json
 
 # Logs
 logs

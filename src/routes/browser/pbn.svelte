@@ -1,12 +1,30 @@
 <script>
     import Image from "svelte-image";
-    import { createEventDispatcher } from 'svelte';
+    import { createEventDispatcher, onMount } from 'svelte';
+    import { user, logged_in } from '../../stores/auth-store'
     import BackArrow from '../../../static/images/icon_arrow_back.svg'
     import IconLike from "../../../static/images/icon_like.svg"
     import IconDislike from "../../../static/images/icon_dislike.svg"
     import dateFormat from 'dateformat'
 
     export let selectedPBN = {}
+    var user_likes
+    var like_modify_value = 0
+    var dislike_modify_value = 0
+
+    onMount(()=> {
+        const like = document.getElementById("like-icon")
+        const dislike = document.getElementById("dislike-icon")
+
+        if(selectedPBN.likers.includes($user.id)){
+            user_likes = true
+            like.style.fill="orange"
+        }
+        else if(selectedPBN.dislikers.includes($user.id)){
+            user_likes = false
+            dislike.style.fill="orange"
+        }
+    })
 
     const formatTags = () => {
         let str = ""
@@ -22,6 +40,82 @@
     let backClicked = () => {
         dispatch('toggle')
     }
+
+    const likePBN = () => {
+        const like = document.getElementById("like-icon")
+        const dislike = document.getElementById("dislike-icon")
+        dislike.style.fill="#fff"
+        like.style.fill="orange"
+
+        if(!user_likes){
+            like_modify_value = 1
+            dislike_modify_value = -1
+        }else{
+            like_modify_value = 0
+            dislike_modify_value = 0
+        }
+
+        const body = {
+            userid: $user.id,
+            pbnid: selectedPBN._id
+        }
+
+        return new Promise((resolve) => {
+            fetch(`http://localhost:3000/browser/like.json`, {
+                method: 'POST',
+                body: JSON.stringify(body),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }).then(response => {
+                response.blob().then(blob => {
+                    var reader = new FileReader()
+                    reader.readAsDataURL(blob)
+                    reader.onload = (e) => {
+                        resolve(e.target.result)
+                    }
+                })
+            })
+        })
+	}
+
+    const dislikePBN = () => {
+        const like = document.getElementById("like-icon")
+        const dislike = document.getElementById("dislike-icon")
+        dislike.style.fill="orange"
+        like.style.fill="#fff"
+
+        if(user_likes){
+            like_modify_value = -1
+            dislike_modify_value = 1
+        }else{
+            like_modify_value = 0
+            dislike_modify_value = 0
+        }
+
+        const body = {
+            userid: $user.id,
+            pbnid: selectedPBN._id
+        }
+
+        return new Promise((resolve) => {
+            fetch(`http://localhost:3000/browser/dislike.json`, {
+                method: 'POST',
+                body: JSON.stringify(body),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }).then(response => {
+                response.blob().then(blob => {
+                    var reader = new FileReader()
+                    reader.readAsDataURL(blob)
+                    reader.onload = (e) => {
+                        resolve(e.target.result)
+                    }
+                })
+            })
+        })
+	}
 </script>
 
 <div class="container">
@@ -106,19 +200,21 @@
             </a>
         </div>
     </div>
-    <div class="section">
-        <div class="title">Feedback</div>
-        <div class="feedback-area">
-            <div class="feedback-card">
-            <img class="feedback-button" src={IconLike} alt="likes"/>
-                {selectedPBN.likes}
-            </div>
-            <div class="feedback-card">
-                <img class="feedback-button" src={IconDislike} alt="dislikes"/>
-                {selectedPBN.dislikes}
+    {#if $logged_in}
+        <div class="section">
+            <div class="title">Feedback</div>
+            <div class="feedback-area">
+                <div on:click={likePBN} class="feedback-card">
+                    <svg id="like-icon" class="feedback-button" xmlns="http://www.w3.org/2000/svg" fill="#fff" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0V0z" fill="none"/><path d="M1 21h4V9H1v12zm22-11c0-1.1-.9-2-2-2h-6.31l.95-4.57.03-.32c0-.41-.17-.79-.44-1.06L14.17 1 7.59 7.59C7.22 7.95 7 8.45 7 9v10c0 1.1.9 2 2 2h9c.83 0 1.54-.5 1.84-1.22l3.02-7.05c.09-.23.14-.47.14-.73v-2z"/></svg>
+                    {selectedPBN.likes + like_modify_value}
+                </div>
+                <div on:click={dislikePBN} class="feedback-card">
+                    <svg id="dislike-icon" class="feedback-button" xmlns="http://www.w3.org/2000/svg" fill="#fff" height="24" viewBox="0 0 24 24" width="24"><path d="M0 0h24v24H0z" fill="none"/><path d="M15 3H6c-.83 0-1.54.5-1.84 1.22l-3.02 7.05c-.09.23-.14.47-.14.73v2c0 1.1.9 2 2 2h6.31l-.95 4.57-.03.32c0 .41.17.79.44 1.06L9.83 23l6.59-6.59c.36-.36.58-.86.58-1.41V5c0-1.1-.9-2-2-2zm4 0v12h4V3h-4z"/></svg>
+                    {selectedPBN.dislikes + dislike_modify_value}
+                </div>
             </div>
         </div>
-    </div>
+    {/if}
 </div>
 
 <style>
@@ -171,6 +267,7 @@ img {
     display: flex;
     flex-direction: column;
     align-items: center;
+    cursor: pointer;
 }
 .feedback-button{
     height: 64px;

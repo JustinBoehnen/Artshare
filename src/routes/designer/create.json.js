@@ -29,6 +29,8 @@ export async function post(req, res) {
 				tags: req.body.tags.map((t) => t.toLowerCase()),
 				likes: 0,
 				dislikes: 0,
+				likers: [],
+				dislikers: [],
 				images: req.body.images,
 			})
 

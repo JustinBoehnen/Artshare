@@ -49,7 +49,7 @@
         {#await thumbnail}
             Loading Image...
         {:then res}
-            <Image height="100px" src={res} />
+            <Image height="110px" src={res} />
         {/await}
     </div>
     <div class="details">
@@ -96,7 +96,8 @@
     }
     .thumbnail{
         width: 100%;
-        height: 100px;
+        height: 110px;
+        object-fit: contain;
     }
     .details{
         display: flex;

@@ -36,6 +36,7 @@
     
     <div class="container">
         <div class="card">
+            <h2 style="margin-top:0; margin-bottom:0.5em">crop your image</h2>
             <div class="cropper">
                 <Cropper on:cropcomplete={cropComplete} restrictPosition=true image={src_img.src} bind:crop bind:zoom zoomSpeed={0.1} aspect={aspectW/aspectH}/>
             </div>
@@ -54,6 +55,11 @@
     </div>
     
     <style>
+        h2{
+            text-align: center;
+            margin-bottom: 0.5em;
+            margin-top: 0;
+        }   
         .card{
             min-width: 15em;
             box-sizing: border-box;
@@ -65,7 +71,7 @@
             display: flex;
             flex-direction: column;
             align-items: center;
-            padding:2em 1.5em 1.5em 1.5em;
+            padding:1em;
         }
         .cropper{
             border-radius: 0.5em;

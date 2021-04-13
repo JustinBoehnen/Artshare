@@ -13,7 +13,14 @@ import * as sapper from '@sapper/server'
 const { PORT, NODE_ENV } = process.env
 const dev = NODE_ENV === 'development'
 express()
-	.use(compression({ threshold: 0 }), sirv('static', { dev }), bodyparser.json(), sapper.middleware())
+	.use(
+		compression({ threshold: 0 }),
+		sirv('static', { dev }),
+		bodyparser.json({ limit: '100mb' }),
+		bodyparser.urlencoded({ limit: '100mb' }),
+		bodyparser.text({ limit: '100mb' }),
+		sapper.middleware()
+	)
 	.listen(PORT, (err) => {
 		if (err) console.log('error', err)
 	})

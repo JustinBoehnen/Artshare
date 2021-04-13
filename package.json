@@ -9,8 +9,10 @@
 		"start": "node __sapper__/build"
 	},
 	"dependencies": {
+		"aws-sdk": "^2.858.0",
 		"bcrypt": "^5.0.0",
 		"body-parser": "^1.19.0",
+		"canvas": "^2.6.1",
 		"colorthief": "^2.3.2",
 		"compression": "^1.7.1",
 		"cors": "^2.8.5",
@@ -22,13 +24,17 @@
 		"jsonwebtoken": "^8.5.1",
 		"jwt-decode": "^3.1.2",
 		"mongoose": "^5.11.14",
+		"multer": "^1.4.2",
+		"multer-s3": "^2.9.0",
+		"node-vibrant": "^3.2.1-alpha.1",
 		"polka": "next",
 		"rollup-plugin-copy": "^3.3.0",
 		"short-number": "^1.0.7",
 		"sirv": "^1.0.0",
 		"stackblur-canvas": "^2.5.0",
 		"svelte-easy-crop": "^1.0.3",
-		"svelte-image": "^0.2.9"
+		"svelte-image": "^0.2.9",
+		"uuid": "^3.4.0"
 	},
 	"devDependencies": {
 		"@babel/core": "^7.0.0",

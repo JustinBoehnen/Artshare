@@ -52,7 +52,6 @@
         const x = e.offsetX*xScale
         const y = e.offsetY*yScale
         const color = getColorAtPos(x,y)
-        console.log("click!", `background: rgb(${color[0]},${color[1]},${color[2]})`)
         if(palette.length < 100){
             palette.push(getColorAtPos(x,y))
             palette = palette
@@ -78,25 +77,27 @@
         else if (dynamic_count < 2)
             dynamic_count = 2
 
-		palette = colorThief.getPalette(src_img, dynamic_count, 1)
-        console.log(palette.length)
+		palette = colorThief.getPalette(src_img, dynamic_count)
     }
 
 </script>
     
     <div class="container">
         <div class="card">
-            <div class="form-item">
-                <div class="color-header">
-                    <div class="label">palette</div>
-                    <div class="label">{palette.length}/100</div>
+            <h2>pick your colors</h2>
+            {#if palette.length > 0}
+                <div class="form-item">
+                    <div class="color-header">
+                        <div class="label">palette</div>
+                        <div class="label">{palette.length}/100</div>
+                    </div>
+                    <div class="colors">
+                        {#each palette as color, i}
+                            <div on:click={() => {removeColor(i)}} class="color-block" style="background-color:rgb({color[0]}, {color[1]}, {color[2]})"/>
+                        {/each}
+                    </div>
                 </div>
-                <div class="colors">
-                    {#each palette as color, i}
-                        <div on:click={() => {removeColor(i)}} class="color-block" style="background-color:rgb({color[0]}, {color[1]}, {color[2]})"/>
-                    {/each}
-                </div>
-            </div>
+            {/if}
             <div class="form-item">
                 <div class="label">color picker</div>
                 <div id="color-preview" class="color-preview"/>
@@ -117,6 +118,11 @@
     </div>
     
     <style>
+        h2{
+            text-align: center;
+            margin-bottom: 0.5em;
+            margin-top: 0;
+        }
         .dynamic-color-section{
             display: flex;
             flex-direction: row;
@@ -127,6 +133,7 @@
             margin-top: 0.5em;
             border-radius: 0.5em;
             height: 32px;
+            background-color: white;
         }
         .color-picker-image{
             width: 100%;
@@ -190,7 +197,7 @@
             font-weight:bold;
             padding:10px 39px;
             text-decoration:none;
-            margin-top: 2em;
+            margin-top: 1em;
         }
         button:hover {
             background-color:#4a40d4;
