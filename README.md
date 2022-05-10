@@ -1,152 +1,40 @@
-# sapper-template
-
-The default template for setting up a [Sapper](https://github.com/sveltejs/sapper) project. Can use either Rollup or webpack as bundler.
-
-
-## Getting started
-
-
-### Using `degit`
-
-To create a new Sapper project based on Rollup locally, run
-
-```bash
-npx degit "sveltejs/sapper-template#rollup" my-app
-```
-
-For a webpack-based project, instead run
-
-```bash
-npx degit "sveltejs/sapper-template#webpack" my-app
-```
-
-[`degit`](https://github.com/Rich-Harris/degit) is a scaffolding tool that lets you create a directory from a branch in a repository.
-
-Replace `my-app` with the path where you wish to create the project.
-
-
-### Using GitHub templates
-
-Alternatively, you can create the new project as a GitHub repository using GitHub's template feature.
-
-Go to either [sapper-template-rollup](https://github.com/sveltejs/sapper-template-rollup) or [sapper-template-webpack](https://github.com/sveltejs/sapper-template-webpack) and click on "Use this template" to create a new project repository initialized by the template.
-
-
-### Running the project
-
-Once you have created the project, install dependencies and run the project in development mode:
-
-```bash
-cd my-app
-npm install # or yarn
-npm run dev
-```
-
-This will start the development server on [localhost:3000](http://localhost:3000). Open it and click around.
-
-You now have a fully functional Sapper project! To get started developing, consult [sapper.svelte.dev](https://sapper.svelte.dev).
-
-### Using TypeScript
-
-By default, the template uses plain JavaScript. If you wish to use TypeScript instead, you need some changes to the project:
-
- * Add `typescript` as well as typings as dependences in `package.json`
- * Configure the bundler to use [`svelte-preprocess`](https://github.com/sveltejs/svelte-preprocess) and transpile the TypeScript code.
- * Add a `tsconfig.json` file
- * Update the project code to TypeScript
-
-The template comes with a script that will perform these changes for you by running
-
-```bash
-node scripts/setupTypeScript.js
-```
-
-`@sapper` dependencies are resolved through `src/node_modules/@sapper`, which is created during the build. You therefore need to run or build the project once to avoid warnings about missing dependencies.
-
-The script does not support webpack at the moment.
-
-## Directory structure
-
-Sapper expects to find two directories in the root of your project —  `src` and `static`.
-
-
-### src
-
-The [src](src) directory contains the entry points for your app — `client.js`, `server.js` and (optionally) a `service-worker.js` — along with a `template.html` file and a `routes` directory.
-
-
-#### src/routes
-
-This is the heart of your Sapper app. There are two kinds of routes — *pages*, and *server routes*.
-
-**Pages** are Svelte components written in `.svelte` files. When a user first visits the application, they will be served a server-rendered version of the route in question, plus some JavaScript that 'hydrates' the page and initialises a client-side router. From that point forward, navigating to other pages is handled entirely on the client for a fast, app-like feel. (Sapper will preload and cache the code for these subsequent pages, so that navigation is instantaneous.)
-
-**Server routes** are modules written in `.js` files, that export functions corresponding to HTTP methods. Each function receives Express `request` and `response` objects as arguments, plus a `next` function. This is useful for creating a JSON API, for example.
-
-There are three simple rules for naming the files that define your routes:
-
-* A file called `src/routes/about.svelte` corresponds to the `/about` route. A file called `src/routes/blog/[slug].svelte` corresponds to the `/blog/:slug` route, in which case `params.slug` is available to the route
-* The file `src/routes/index.svelte` (or `src/routes/index.js`) corresponds to the root of your app. `src/routes/about/index.svelte` is treated the same as `src/routes/about.svelte`.
-* Files and directories with a leading underscore do *not* create routes. This allows you to colocate helper modules and components with the routes that depend on them — for example you could have a file called `src/routes/_helpers/datetime.js` and it would *not* create a `/_helpers/datetime` route.
-
-
-#### src/node_modules/images
-
-Images added to `src/node_modules/images` can be imported into your code using `import 'images/<filename>'`. They will be given a dynamically generated filename containing a hash, allowing for efficient caching and serving the images on a CDN.
-
-See [`index.svelte`](src/routes/index.svelte) for an example.
-
-
-#### src/node_modules/@sapper
-
-This directory is managed by Sapper and generated when building. It contains all the code you import from `@sapper` modules.
-
-
-### static
-
-The [static](static) directory contains static assets that should be served publicly. Files in this directory will be available directly under the root URL, e.g. an `image.jpg` will be available as `/image.jpg`.
-
-The default [service-worker.js](src/service-worker.js) will preload and cache these files, by retrieving a list of `files` from the generated manifest:
-
-```js
-import { files } from '@sapper/service-worker';
-```
-
-If you have static files you do not want to cache, you should exclude them from this list after importing it (and before passing it to `cache.addAll`).
-
-Static files are served using [sirv](https://github.com/lukeed/sirv).
-
-
-## Bundler configuration
-
-Sapper uses Rollup or webpack to provide code-splitting and dynamic imports, as well as compiling your Svelte components. With webpack, it also provides hot module reloading. As long as you don't do anything daft, you can edit the configuration files to add whatever plugins you'd like.
-
-
-## Production mode and deployment
-
-To start a production version of your app, run `npm run build && npm start`. This will disable live reloading, and activate the appropriate bundler plugins.
-
-You can deploy your application to any environment that supports Node 10 or above. As an example, to deploy to [Vercel Now](https://vercel.com) when using `sapper export`, run these commands:
-
-```bash
-npm install -g vercel
-vercel
-```
-
-If your app can't be exported to a static site, you can use the [vercel-sapper](https://github.com/thgh/vercel-sapper) builder. You can find instructions on how to do so in its [README](https://github.com/thgh/vercel-sapper#basic-usage).
-
-
-## Using external components
-
-When using Svelte components installed from npm, such as [@sveltejs/svelte-virtual-list](https://github.com/sveltejs/svelte-virtual-list), Svelte needs the original component source (rather than any precompiled JavaScript that ships with the component). This allows the component to be rendered server-side, and also keeps your client-side app smaller.
-
-Because of that, it's essential that the bundler doesn't treat the package as an *external dependency*. You can either modify the `external` option under `server` in [rollup.config.js](rollup.config.js) or the `externals` option in [webpack.config.js](webpack.config.js), or simply install the package to `devDependencies` rather than `dependencies`, which will cause it to get bundled (and therefore compiled) with your app:
-
-```bash
-npm install -D @sveltejs/svelte-virtual-list
-```
-
-
-## Bugs and feedback
-
-Sapper is in early development, and may have the odd rough edge here and there. Please be vocal over on the [Sapper issue tracker](https://github.com/sveltejs/sapper/issues).
+# Artshare
+Artshare is my senior project at Oregon Tech.
+The general premise of artshare is that is is both a robust paint-by-number generator and a social platform for sharing paint-by-numbers.
+
+### The Generator
+This paint-by-number generator is one of the most robust that has been developed for a web-facing application, and (in my opinion) by far the most customizable. 
+The creation process is broken down into the following steps:
+1. The user uploads an image from their computer.
+2. The user crops the image with interactive handles and a bounding box (if desired).
+3. The user clicks on the image to select colors they wish to be in the final image, or they may chose to have the application pick a desired number of colors for them. A best distinct color algorithm is utilized to ensure that the colors automatically picked will give the final image high contrast and a wide color variety.
+#### So begins the color quantization, outlining, and labelling steps:
+4. The user then sees a preview of the final paint by number (before any customization).
+5. If the user desires to do so they may customize everything from:
+    - Quantization cell density (how big or small the average color region is, including minimum region size)
+    - Background color
+    - Outline color and size (or the option to remove outlines all together)
+    - Label color and size (or the option to remove outlines all together)
+    - And even the attributes of the gaussian blur used before quantization, which can heavily effect the clarity of the final image. In practice increasing blur leads to an easier to paint image while decreasing blue makes for a far more detailed but advanced artwork.
+    - and more.
+6. If happy with the pre-generated image or their option selections the user may generate a final image. (If they are unhappy with that image the user is welcome to go to any previous step whenever they wish)
+7. Once the final image is generated the user can download the following files:
+    - The original (cropped) uploaded image
+    - The image the user is supposed to paint (outlines and number labels)
+    - What the completed (painted) artwork should look like (with outlines and labels)
+    - What the completed (painted) artwork should look like (without outlines and labels)
+8. The user is welcome to download these files individually or all together in a compressed .zip archive without any futher obligation.
+9. Or, they may share their paint-by-number with other users on the site (detailed in the social aspect), wherin all the images listed in step 7 are available for download.
+
+### The Social Aspect
+Once done creating their paint-by-number a user is prompted to upload their newly-created artwork (if they'd like). If they choose to do so they will be asked to name their work, choose an alias to upload the work under (if they are not logged in), and then tag their work with as many keywords as they can think of.
+From there the paint-by-number will be uploaded to my database and then be accessible to any user on the site via the explore page. On the explore page users may filter and sort artwork by many different specifiers, including but not limited to:
+- Number of colors in the artwork (paint colors needed)
+- Any number of tags the original creator decided to add
+- Number of likes or dislikes the artwork has recieved
+
+If the user is logged in when they upload their artwork after creation (the user is prompted to log in or make an account at that time) then they have special control of their uploaded artwork in the explore page, specifically they are given the option to delete their artwork without any intervention needed by site administrators.
+
+Additionally, users in the explore page may like or dislike images to boost or supress the images likelihood to be found by other users. They also have the option to report the image for innapropriate content.
+
+###### This application (front and back) was developed with svelte
